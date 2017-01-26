@@ -67,7 +67,10 @@ class BlogHandler(webapp2.RequestHandler):
     
 class MainPage(BlogHandler):
   def get(self):
-    self.render('front-page.html',user = self.user)      
+    posts = db.GqlQuery('select * from Post')
+    print "posts",posts
+    # self.write(posts)      
+    self.render('front-page.html',posts = posts)
 
 class Register(BlogHandler):
   def get(self):

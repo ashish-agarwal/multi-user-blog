@@ -14,3 +14,6 @@ class Post(db.Model):
     def by_id(cls, uid):
         return cls.get_by_id(uid)
     
+    @classmethod
+    def query(cls, query_string, *args, **kwds):
+        return db.GqlQuery(query_string, *args, **kwds)

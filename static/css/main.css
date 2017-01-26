@@ -8,12 +8,13 @@
 
 .card {
   margin-top: 10px;
+  padding: 10px;
   box-sizing: border-box;
   border-radius: 2px;
   background-clip: padding-box;
 }
 .card span.card-title {
-    color: #fff;
+    color: #000;
     font-size: 24px;
     font-weight: 300;
     text-transform: uppercase;
@@ -22,6 +23,7 @@
 .card .card-image {
   position: relative;
   overflow: hidden;
+  padding-left: 15px;
 }
 .card .card-image img {
   border-radius: 2px 2px 0 0;
@@ -30,11 +32,9 @@
   z-index: -1;
 }
 .card .card-image span.card-title {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  padding: 16px;
+    font-weight:2px; 
 }
+
 .card .card-content {
   padding: 16px;
   border-radius: 0 0 2px 2px;
@@ -61,4 +61,9 @@
 .card .card-action a:hover {
   color: #ffd8a6;
   text-decoration: none;
+}
+
+
+.like-button {
+  font-size: 20px;
 }
