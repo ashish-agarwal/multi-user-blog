@@ -1,57 +1,45 @@
 {% extends "base.html" %} {% block content %}
-
-<h2>Signup</h2>
-<form method="post">
-    <table>
-        <tr>
-            <td class="label">
-                Username
-            </td>
-            <td>
-                <input type="text" name="username" value="{{username}}">
-            </td>
-            <td class="error">
-                {{error_username}}
-            </td>
-        </tr>
-
-        <tr>
-            <td class="label">
-                Password
-            </td>
-            <td>
-                <input type="password" name="password" value="">
-            </td>
-            <td class="error">
-                {{error_password}}
-            </td>
-        </tr>
-
-        <tr>
-            <td class="label">
-                Verify Password
-            </td>
-            <td>
-                <input type="password" name="verify" value="">
-            </td>
-            <td class="error">
-                {{error_verify}}
-            </td>
-        </tr>
-
-        <tr>
-            <td class="label">
-                Email (optional)
-            </td>
-            <td>
-                <input type="text" name="email" value="{{email}}">
-            </td>
-            <td class="error">
-                {{error_email}}
-            </td>
-        </tr>
-    </table>
-
-    <input type="submit">
-</form>
+<div class="signupform">
+    <h1 class="title">Signup</h1>
+    <form method="post">
+        <div class="form-group">
+        <label for="Username">Username</label>
+        <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-users fa" aria-hidden="true"></i></span>
+            <input type="text" class="form-control" name="username" value="{{username}}" id="Username" placeholder="Username">
+        </div>
+        <span class="error">{{error_username}}</span>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-lock fa" aria-hidden="true"></i></span>
+                <input type="password" class="form-control" id="password" value="{{password}}" name="password" placeholder="Password">
+            </div>
+            <span class="error">{{error_password}}</span>
+        </div>
+        <div class="form-group">
+            <label for="verify">Password</label>
+            <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-lock fa" aria-hidden="true"></i></span>
+                <input type="password" class="form-control" id="verify" name="verify" value="{{verify}}" placeholder="Password">
+            </div>
+            <span class="error">{{error_verify}}</span>
+        </div>
+        <div class="form-group">
+            <label for="exampleInputEmail1">Email address</label>
+            <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-envelope fa" aria-hidden="true"></i></span>
+                <input type="email" class="form-control" name="email" id="exampleInputEmail1" value="{{email}}" placeholder="Email">
+            </div>
+            <span class="error">{{error_email}}</span>
+        </div>
+        <!--<div class="form-group">
+        <label for="exampleInputFile">File input</label>
+        <input type="file" id="exampleInputFile">
+        <p class="help-block">Example block-level help text here.</p>
+    </div>-->
+        <button type="submit" class="btn btn-default signup-button">Submit</button>
+    </form>
+</div>
 {% endblock %}
