@@ -122,7 +122,7 @@ class PostHandler(BlogHandler):
         # post = Post.by_id(key)
         post = db.get(key)
         print post
-        self.render("post.html",p = post)
+        self.render("post-details.html",p = post)
 
 
 USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")

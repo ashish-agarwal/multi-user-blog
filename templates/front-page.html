@@ -1,6 +1,6 @@
 {% extends "base.html" %} {% import "post.html" as post %}
 {% block content %}
 {% for p in posts %}
-	{{post.post(p)}}
+	{{post.post(p,'inactive','hide')}}
 {% endfor %}
 {% endblock %}
