@@ -1,25 +1,32 @@
-{% extends "base.html" %} {% block content %}
-
-<div class="row">
+{% macro post(p) -%}
  <!--Card Projects -->
-<div class="col-md-6 col-md-offset-3">
-    <div class="card">
-        <div class="card-image">
-            <span class="card-title">{{p.contemt}}</span>
-        </div>
-        <div class="card-content">
-            <p>{{p.subject}}.</p>
-        </div>
+ <div class="col-md-12">
+	<div class="card">
+		<div class="card-image">
+			<span class="card-title">{{p.subject}}</span>
+		</div>
+{{p.key}}
+		<div class="card-content">
+			<p>{{p.content}}.</p>
+		</div>
 
-        <div class="card-action">
-            <a href="#" target="new_blank">{{p.created.strftime("%b %d, %Y")}}</a>
-            <a href="#" target="new_blank">Link</a>
-            <a href="#" target="new_blank">Link</a>
-            <a href="#" target="new_blank">Link</a>
-            <a href="#" target="new_blank">Link</a>
-        </div>
-    </div>
+		<div class="card-action">
+			<div class="row">
+				<div class="col-lg-1">
+					<button type="button" class="btn btn-default like-button">
+							<span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>&nbspLike
+						</button>
+				</div>
+				<div class="col-lg-1">
+					<button type="button" class="btn btn-default like-button">Comment</button>
+				</div>
+				<div class="col-lg-6">
+				</div>
+				<div class="col-lg-4 text-right">
+					<a href="#" target="new_blank">{{p.created.strftime("%b %d, %Y")}}</a>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
-</div>
-
-{% endblock %}
+{%- endmacro %}

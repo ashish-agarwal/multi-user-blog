@@ -1,32 +1,6 @@
-{% extends "base.html" %} {% block content %} {% for p in posts %}
-<!--Card Projects -->
-<div class="col-md-12">
-	<div class="card">
-		<div class="card-image">
-			<span class="card-title">{{p.subject}}</span>
-		</div>
-
-		<div class="card-content">
-			<p>{{p.content}}.</p>
-		</div>
-
-		<div class="card-action">
-			<div class="row">
-				<div class="col-lg-1">
-					<button type="button" class="btn btn-default like-button">
-							<span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>&nbspLike
-						</button>
-				</div>
-				<div class="col-lg-1">
-					<button type="button" class="btn btn-default like-button">Comment</button>
-				</div>
-				<div class="col-lg-6">
-				</div>
-				<div class="col-lg-4 text-right">
-					<a href="#" target="new_blank">{{p.created.strftime("%b %d, %Y")}}</a>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
-<br><br> {% endfor %} {% endblock %}
+{% extends "base.html" %} {% import "post.html" as post %}
+{% block content %}
+{% for p in posts %}
+	{{post.post(p)}}
+{% endfor %}
+{% endblock %}
