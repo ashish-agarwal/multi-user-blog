@@ -9,9 +9,10 @@ class Like(db.Model):
     post = db.ReferenceProperty(Post)
     created = db.DateTimeProperty(auto_now_add = True)
     last_modified = db.DateTimeProperty(auto_now = True)
+    liked = db.BooleanProperty()
 
     @classmethod
-    def find(cls, uid, pid,, *args, **kwds):
+    def find(cls, uid, pid, *args, **kwds):
         return db.GqlQuery("SELECT * FROM Like where user = "+uid+" AND post="+pid)
     
     @classmethod

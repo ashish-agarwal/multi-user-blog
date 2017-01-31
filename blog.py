@@ -9,6 +9,7 @@ import re
 # Importing db models
 from models.user import User
 from models.post import Post
+from models.like import Like
 from google.appengine.ext import db
 
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
@@ -32,6 +33,9 @@ def check_secure_val(secure_val):
 
 def blog_key(name = 'default'):
     return db.Key.from_path('blogs', name)
+
+def like_key(name = 'default'):
+    return db.Key.from_path('like', name)
 
 
 class BlogHandler(webapp2.RequestHandler):
@@ -184,11 +188,32 @@ class Register(BlogHandler):
             self.redirect('/')
 
 
+
+
+class LikeHandler(BlogHandler):
+    def get(self):
+        self.render("signup-form.html")
+
+    def post(self, id):
+        print "**************************** User*************************",self.user
+        if self.user is None:
+            print "**************************** User Again*************************",self.user            
+            self.redirect('/')
+            return
+
+        print "**************************** User Again 2*************************",self.user            
+        self.liked = bool(self.request.get('liked'))
+        print "**********************************",self.liked,id
+        l = Like(parent = like_key(), user = self.user, post = id, liked = self.liked)
+        l.put()
+        self.redirect('/')            
+
 app = webapp2.WSGIApplication([('/', MainPage),
                                ('/login',Login),
                                ('/logout',Logout),
                                ('/newpost', NewPost),
                                ('/signup', Register),
-                               ('/blog/(\d+)',PostHandler)
+                               ('/blog/(\d+)',PostHandler),
+                               ('/blog/(\d+)/like',LikeHandler)                               
                                ],
                               debug=True)
