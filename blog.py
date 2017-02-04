@@ -75,8 +75,7 @@ class MainPage(BlogHandler):
   def get(self):
     posts = db.GqlQuery('select * from Post')
     print "posts",posts
-    # self.write(posts)      
-    self.render('front-page.html',posts = posts)
+    self.render('front-page.html',posts = posts,user = self.user)
     
 class Login(BlogHandler):
     def post(self):
@@ -122,8 +121,6 @@ class NewPost(BlogHandler):
 class PostHandler(BlogHandler):
     def get(self, id):
         key = db.Key.from_path('Post', int(id), parent=blog_key())
-        print id,key
-        # post = Post.by_id(key)
         post = db.get(key)
         print post
         self.render("post-details.html",p = post)
@@ -202,12 +199,36 @@ class LikeHandler(BlogHandler):
         l.put()
         self.redirect('/')            
 
+class EditHandler(BlogHandler):
+    def get(self, id):
+        post = Post.by_id(int(id))
+        self.render("new-post.html",subject = post.subject,content = post.content)
+
+    def post(self, id):
+        if not self.user:
+            self.redirect('/')
+
+        subject = self.request.get('subject')
+        content = self.request.get('content')
+
+        if subject and content:
+            p = Post.by_id(int(id))
+            p.subject = subject
+            p.content = content
+            p.put()
+            self.redirect('/blog/%s' % str(p.key().id()))
+        else:
+            error = "subject and content, please!"
+            self.render("new-post.html", subject=subject, content=content, error=error)
+
+
 app = webapp2.WSGIApplication([('/', MainPage),
                                ('/login',Login),
                                ('/logout',Logout),
                                ('/newpost', NewPost),
                                ('/signup', Register),
                                ('/blog/(\d+)',PostHandler),
+                               ('/blog/edit/(\d+)',EditHandler),
                                ('/blog/(\d+)/like',LikeHandler)                               
                                ],
                               debug=True)

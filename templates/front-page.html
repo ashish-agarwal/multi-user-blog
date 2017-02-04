@@ -1,6 +1,11 @@
 {% extends "base.html" %} {% import "post.html" as post %}
 {% block content %}
 {% for p in posts %}
-	{{post.post(p,'inactive','hide')}}
+	{% if user and (user.key().id() == p.user.key().id() )  %}
+		{{post.post(p,'inactive')}}
+	{% else %}	
+		{{post.post(p,'inactive','hide')}}
+	{% endif %}	
+	
 {% endfor %}
 {% endblock %}
