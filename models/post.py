@@ -3,6 +3,10 @@
 from google.appengine.ext import db
 from user import User
 
+def blog_key(name = 'default'):
+    return db.Key.from_path('blogs', name)
+
+
 class Post(db.Model):
     user = db.ReferenceProperty(User)
     subject = db.StringProperty(required = True)
@@ -12,7 +16,7 @@ class Post(db.Model):
 
     @classmethod
     def by_id(cls, uid):
-        return cls.get_by_id(uid)
+        return cls.get_by_id(uid, parent = blog_key())
     
     @classmethod
     def query(cls, query_string, *args, **kwds):

@@ -187,24 +187,18 @@ class Register(BlogHandler):
             self.login(u)
             self.redirect('/')
 
-
-
-
 class LikeHandler(BlogHandler):
     def get(self):
         self.render("signup-form.html")
 
     def post(self, id):
-        print "**************************** User*************************",self.user
         if self.user is None:
-            print "**************************** User Again*************************",self.user            
             self.redirect('/')
             return
 
-        print "**************************** User Again 2*************************",self.user            
         self.liked = bool(self.request.get('liked'))
-        print "**********************************",self.liked,id
-        l = Like(parent = like_key(), user = self.user, post = id, liked = self.liked)
+        p = Post.by_id(int(id))
+        l = Like(parent = like_key(), user = self.user, post = p, liked = self.liked)
         l.put()
         self.redirect('/')            
 
