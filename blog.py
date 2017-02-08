@@ -12,6 +12,10 @@ from models.post import Post
 from models.like import Like
 from google.appengine.ext import db
 
+import logging
+
+logger = logging.getLogger()
+
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
                                autoescape = True)
@@ -73,9 +77,18 @@ class BlogHandler(webapp2.RequestHandler):
     
 class MainPage(BlogHandler):
   def get(self):
-    posts = db.GqlQuery('select * from Post')
-    print "posts",posts
-    self.render('front-page.html',posts = posts,user = self.user)
+    posts = Post.all()
+    logger.info(posts)  
+    likes = Like.all().filter('user =',self.user)
+
+    for post in posts:
+        post.liked = any(like.post.key().id() == post.key().id() for like in likes)
+        print post
+        
+    for post in posts:
+        logger.info(post.liked)  
+            
+    self.render('front-page.html', posts = posts, user = self.user, likes = likes)
     
 class Login(BlogHandler):
     def post(self):
@@ -116,7 +129,7 @@ class NewPost(BlogHandler):
             self.redirect('/blog/%s' % str(p.key().id()))
         else:
             error = "subject and content, please!"
-            self.render("newpost.html", subject=subject, content=content, error=error)
+            self.render("new-post.html", subject=subject, content=content, error=error)
 
 class PostHandler(BlogHandler):
     def get(self, id):
@@ -205,7 +218,7 @@ class EditHandler(BlogHandler):
         self.render("new-post.html",subject = post.subject,content = post.content)
 
     def post(self, id):
-        if not self.user:
+        if self.user:
             self.redirect('/')
 
         subject = self.request.get('subject')
@@ -221,6 +234,19 @@ class EditHandler(BlogHandler):
             error = "subject and content, please!"
             self.render("new-post.html", subject=subject, content=content, error=error)
 
+class DeleteHandler(BlogHandler):
+    def get(self, id):
+        if self.user:
+            self.redirect('/')
+
+        # p = Post.by_id(int(id))
+        l = Like.all().filter('post =', id).get()
+        print l
+        for like in l:
+            print like
+            like.delete()
+        self.redirect('/')   
+
 
 app = webapp2.WSGIApplication([('/', MainPage),
                                ('/login',Login),
@@ -229,6 +255,7 @@ app = webapp2.WSGIApplication([('/', MainPage),
                                ('/signup', Register),
                                ('/blog/(\d+)',PostHandler),
                                ('/blog/edit/(\d+)',EditHandler),
+                               ('/blog/delete/(\d+)',DeleteHandler),
                                ('/blog/(\d+)/like',LikeHandler)                               
                                ],
                               debug=True)
