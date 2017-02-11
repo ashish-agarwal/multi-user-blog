@@ -21,3 +21,10 @@ class Post(db.Model):
     @classmethod
     def query(cls, query_string, *args, **kwds):
         return db.GqlQuery(query_string, *args, **kwds)
+
+    def getUserName(self):
+        """
+            Gets username of the person, who wrote the blog post.
+        """
+        user = User.by_id(self.user)
+        return user.name

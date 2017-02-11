@@ -78,17 +78,13 @@ class BlogHandler(webapp2.RequestHandler):
 class MainPage(BlogHandler):
   def get(self):
     posts = Post.all()
-    logger.info(posts)  
     likes = Like.all().filter('user =',self.user)
 
     for post in posts:
         post.liked = any(like.post.key().id() == post.key().id() for like in likes)
         print post
-        
-    for post in posts:
-        logger.info(post.liked)  
-            
-    self.render('front-page.html', posts = posts, user = self.user, likes = likes)
+    
+    self.render('front-page.html', posts = posts, user = self.user, likes = likes,error = self.request.get('error'))
     
 class Login(BlogHandler):
     def post(self):
@@ -106,7 +102,7 @@ class Login(BlogHandler):
 class Logout(BlogHandler):
     def get(self):
         self.logout()
-        self.redirect('/')
+        self.redirect("/?error=logged%20out%20of%20application%20successfully")
 
 
 class NewPost(BlogHandler):
@@ -114,11 +110,11 @@ class NewPost(BlogHandler):
         if self.user:
             self.render("new-post.html")
         else:
-            self.redirect("/")
+            self.redirect("/?error=please%20login%20to%20the%20application")
 
     def post(self):
         if not self.user:
-            self.redirect('/')
+            self.redirect("/?error=please%20login%20to%20the%20application")
 
         subject = self.request.get('subject')
         content = self.request.get('content')
@@ -135,8 +131,8 @@ class PostHandler(BlogHandler):
     def get(self, id):
         key = db.Key.from_path('Post', int(id), parent=blog_key())
         post = db.get(key)
-        print post
-        self.render("post-details.html",p = post)
+        likes = Like.by_post(post)
+        self.render("post-details.html",p = post, l =likes, error = self.request.get("error"))
 
 
 USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
@@ -203,23 +199,37 @@ class LikeHandler(BlogHandler):
 
     def post(self, id):
         if self.user is None:
-            self.redirect('/')
+            self.redirect("/?error=please%20login%20to%20the%20application")
             return
 
         self.liked = bool(self.request.get('liked'))
-        p = Post.by_id(int(id))
-        l = Like(parent = like_key(), user = self.user, post = p, liked = self.liked)
+        post = Post.by_id(int(id))
+        l = Like.find(self.user,post)
+        
+        if l:
+            self.redirect("/blog/" + id +
+                            "?error=You already liked this " +
+                            "post.!!")
+            return
+
+        if self.user.key().id() == post.user.key().id():
+            self.redirect("/blog/" + id +
+                            "?error=You cannot like your " +
+                            "post.!!")
+            return
+        l = Like(parent = like_key(), user = self.user, post = post, liked = self.liked)
         l.put()
         self.redirect('/')            
 
 class EditHandler(BlogHandler):
     def get(self, id):
         post = Post.by_id(int(id))
-        self.render("new-post.html",subject = post.subject,content = post.content)
+        error = self.request.get("error")
+        self.render("new-post.html",subject = post.subject,content = post.content,error = error)
 
     def post(self, id):
         if self.user:
-            self.redirect('/')
+            self.redirect("/?error=please%20login%20to%20the%20application")
 
         subject = self.request.get('subject')
         content = self.request.get('content')
@@ -237,7 +247,7 @@ class EditHandler(BlogHandler):
 class DeleteHandler(BlogHandler):
     def get(self, id):
         if self.user:
-            self.redirect('/')
+            self.redirect("/?error=please%20login%20to%20the%20application")
 
         # p = Post.by_id(int(id))
         l = Like.all().filter('post =', id).get()

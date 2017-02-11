@@ -1,5 +1,9 @@
 {% extends "base.html" %} {% import "post.html" as post %}
 
 {% block content %}
-    {{post.post(p,'active','hide')}}
+{% if user and (user.key().id() == p.user.key().id() )  %}
+    {{post.post(p, 'inactive')}}
+{% else %}	
+    {{post.post(p, p.liked, 'hide')}}
+{% endif %}
 {% endblock %}
