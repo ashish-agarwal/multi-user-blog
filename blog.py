@@ -10,6 +10,7 @@ import re
 from models.user import User
 from models.post import Post
 from models.like import Like
+from models.comment import Comment
 from google.appengine.ext import db
 
 import logging
@@ -132,8 +133,43 @@ class PostHandler(BlogHandler):
         key = db.Key.from_path('Post', int(id), parent=blog_key())
         post = db.get(key)
         likes = Like.by_post(post)
-        self.render("post-details.html",p = post, l =likes, error = self.request.get("error"))
+        comments = db.GqlQuery("select * from Comment where post = " +
+                               id + "order by created desc")
+        logger.info(comments)                       
+        logger.info(comments.count())                       
+        self.render("post-details.html",p = post, l =likes, comments = comments, error = self.request.get("error"))
 
+    def post(self, post_id):
+        key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+        post = db.get(key)
+
+        if not post:
+            self.error(404)
+            return
+
+        """
+            On posting comment, new comment tuple is created and stored,
+            with relationship data of user and post.
+        """
+        c = ""
+        if(self.user):
+            # On commenting, it creates new comment tuple
+            if(self.request.get('comment')):
+                c = Comment(parent=blog_key(), user=self.user,
+                            post=int(post_id),
+                            comment=self.request.get('comment'))
+                c.put()
+        else:
+            self.redirect("/login?error=You need to login before " +
+                          "performing edit, like or commenting.!!")
+            return
+
+        comments = db.GqlQuery("select * from Comment where post = " +
+                               post_id + "order by created desc")
+
+        likes = db.GqlQuery("select * from Like where post="+post_id)
+
+        self.redirect('/blog/'+post_id)
 
 USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
 def valid_username(username):
@@ -258,12 +294,72 @@ class DeleteHandler(BlogHandler):
         self.redirect('/')   
 
 
+class DeleteComment(BlogHandler):
+    def get(self, post_id, comment_id):
+        if self.user:
+            key = db.Key.from_path('Comment', int(comment_id),
+                                   parent=blog_key())
+            c = db.get(key)
+            if c.user.key().id() == self.user.key().id():
+                c.delete()
+                self.redirect("/blog/"+post_id)
+            else:
+                self.redirect("/blog/" + post_id + "?error=You don't have " +
+                              "access to delete this comment.")
+        else:
+            self.redirect("/?error=You need to be logged, in order to " +
+                          "delete your comment!!")
+
+
+class EditComment(BlogHandler):
+    def get(self, post_id, comment_id):
+        if self.user:
+            key = db.Key.from_path('Comment', int(comment_id),
+                                   parent=blog_key())
+            c = db.get(key)
+            if c.user.key().id() == self.user.key().id():
+                self.render("editcomment.html", comment=c.comment)
+            else:
+                self.redirect("/blog/" + post_id +
+                              "?error=You don't have access to edit this " +
+                              "comment.")
+        else:
+            self.redirect("/?error=You need to be logged, in order to" +
+                          " edit your post!!")
+
+    def post(self, post_id, comment_id):
+        """
+            Updates post.
+        """
+        if not self.user:
+            self.redirect('/blog')
+
+        comment = self.request.get('comment')
+
+        if comment:
+            key = db.Key.from_path('Comment',
+                                   int(comment_id), parent=blog_key())
+            c = db.get(key)
+            c.comment = comment
+            c.put()
+            self.redirect('/blog/%s' % post_id)
+        else:
+            error = "subject and content, please!"
+            self.render("post-details.html", subject=subject,
+                        content=content, error=error)
+
+
+
 app = webapp2.WSGIApplication([('/', MainPage),
                                ('/login',Login),
                                ('/logout',Logout),
                                ('/newpost', NewPost),
                                ('/signup', Register),
                                ('/blog/(\d+)',PostHandler),
+                               ('/blog/deletecomment/([0-9]+)/([0-9]+)',
+                                DeleteComment),
+                               ('/blog/editcomment/([0-9]+)/([0-9]+)',
+                                EditComment),
                                ('/blog/edit/(\d+)',EditHandler),
                                ('/blog/delete/(\d+)',DeleteHandler),
                                ('/blog/(\d+)/like',LikeHandler)                               
