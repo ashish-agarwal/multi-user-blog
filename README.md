@@ -4,7 +4,7 @@ The goal of this project is to create a simple multi-user blog along the lines o
 
 Users should be able to create an account with login/logout functionality, and create/edit/delete posts and comments.
 
-Checkout the [live](http://fsnd-rrjoson-blog.appspot.com/) version of this project.
+Checkout the [live](https://udacity-multi-blog.appspot.com/) version of this project.
 
 
 ----------
