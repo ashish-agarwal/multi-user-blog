@@ -1,5 +1,10 @@
 {% extends "base.html" %} {% import "post.html" as post %}
 {% block content %}
+<div class="col-md-4 text-right">
+	{% if user %}
+	<a href="/newpost" class="btn btn-primary">New post</a>
+	{% endif %}
+</div>
 {% for p in posts %}
 	{% if user and (user.key().id() == p.user.key().id() )  %}
 		{{post.post(p, 'inactive')}}
