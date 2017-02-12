@@ -270,8 +270,12 @@ class EditHandler(BlogHandler):
         subject = self.request.get('subject')
         content = self.request.get('content')
 
+        p = Post.by_id(int(id))
+        if self.user.key().id() == p.user.key().id():
+            self.redirect("/?error=You%20dont%20have%20permissions%20to%20edit%20this%20post")
+            return
+
         if subject and content:
-            p = Post.by_id(int(id))
             p.subject = subject
             p.content = content
             p.put()
