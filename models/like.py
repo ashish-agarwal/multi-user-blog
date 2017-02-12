@@ -4,17 +4,19 @@ from google.appengine.ext import db
 from user import User
 from post import Post
 
+
 class Like(db.Model):
     user = db.ReferenceProperty(User)
     post = db.ReferenceProperty(Post)
-    created = db.DateTimeProperty(auto_now_add = True)
-    last_modified = db.DateTimeProperty(auto_now = True)
+    created = db.DateTimeProperty(auto_now_add=True)
+    last_modified = db.DateTimeProperty(auto_now=True)
     liked = db.BooleanProperty()
 
     @classmethod
     def find(cls, uid, pid, *args, **kwds):
-        # return db.GqlQuery("SELECT * FROM Like where user = "+uid+" AND post="+pid)
-        u = Like.all().filter('user =', uid).filter('post = ',pid).get()
+        # return db.GqlQuery("SELECT * FROM Like where user = "+uid+" AND
+        # post="+pid)
+        u = Like.all().filter('user =', uid).filter('post = ', pid).get()
         return u
 
     @classmethod
