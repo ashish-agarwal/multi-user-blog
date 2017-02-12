@@ -294,14 +294,14 @@ class EditHandler(BlogHandler):
                     content=post.content, error=error)
 
     def post(self, id):
-        if self.user:
-            self.redirect("/?error=please%20login%20to%20the%20application")
+        if not self.user:
+            return self.redirect("/?error=please%20login%20to%20the%20application")
 
         subject = self.request.get('subject')
         content = self.request.get('content')
 
         p = Post.by_id(int(id))
-        if self.user.key().id() == p.user.key().id():
+        if self.user.key().id() != p.user.key().id():
             self.redirect(
                 "/?error=You%20dont%20have%20permissions%20to%20edit%20this%20post")
             return
@@ -320,15 +320,16 @@ class EditHandler(BlogHandler):
 class DeleteHandler(BlogHandler):
 
     def get(self, id):
-        if self.user:
-            self.redirect("/?error=please%20login%20to%20the%20application")
+        if not self.user:
+            return self.redirect("/?error=please%20login%20to%20the%20application")
 
         # p = Post.by_id(int(id))
         l = Like.all().filter('post =', id).get()
         print l
-        for like in l:
-            print like
-            like.delete()
+        if l.count() > 0:
+            for like in l:
+                print like
+                like.delete()
         self.redirect('/')
 
 
